@@ -1,0 +1,48 @@
+#!/bin/sh
+
+# The goal of this script is to update the jar files associated with 
+# cromwell/womtool to the latest release available.
+# 
+# This script will actually just retrieve the latest version of jar file.
+
+DEBUG=0
+
+if [ ! -f ".cromwell-proj-root" ]; then
+    echo "We are not in the cromwell project root, please go there or touch .cromwell-proj-root file."
+    exit 1
+fi
+
+CURL=$(which curl)
+if [ "1" == $DEBUG ]; then
+    printf "Using curl: %s\n" $CURL
+fi
+
+
+# Find latest version by querying the "latest" tag and reading off the
+# result. Note we use -I (just get header), -L (follow redirs) and redirect
+# to dev/null to avoid output.
+CROMWELL_VERSION_URL=$( $CURL -LsI -w %{url_effective} https://github.com/broadinstitute/cromwell/releases/latest -o /dev/null)
+CROMWELL_VERSION=$(basename $CROMWELL_VERSION_URL)
+printf "Using latest cromwell version (%s).\n" $CROMWELL_VERSION
+
+# If these have already been downloaded, no need to redownload. We 
+# could have a --force, or user could just delete the files.
+if [ -f lib/cromwell-${CROMWELL_VERSION}.jar -a -f lib/womtool-${CROMWELL_VERSION}.jar ]; then
+    echo "Cromwell version ${CROMWELL_VERSION} in lib/ already at latest available version, skipping download."
+    exit 0
+fi
+
+# Retrieve the named version to the lib directory
+# Note the redirect (even the constructed URL redirects to another location)
+# Note also we get both jar files to lib, creating the dirs as we go.
+${CURL} \
+    -L \
+    --create-dirs -o "lib/#1-${CROMWELL_VERSION}.jar" \
+    "https://github.com/broadinstitute/cromwell/releases/download/${CROMWELL_VERSION}/{cromwell,womtool}-${CROMWELL_VERSION}.jar"
+
+if [ ! -s "lib/cromwell-${CROMWELL_VERSION}.jar" -o ! -s "lib/womtool-${CROMWELL_VERSION}.jar" ]; then
+    printf "Error: there were problems downloading the jar files.\n"
+    exit 1
+fi
+
+exit 0

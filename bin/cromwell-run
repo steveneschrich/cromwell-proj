@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+# This script only executes the 'cromwell run' command with all options
+# turned on.
+DEBUG=1
+
+if [ ! -f ".cromwell-proj-root" ]; then
+    echo "Not in cromwell project root, not continuing"
+    exit 1
+fi
+JAVA=$(which java)
+if [ -z "$JAVA" ]; then
+    echo "Cannot find a usable java, please install."
+    exit 1
+fi
+
+CROMWELL=$(ls lib/cromwell-*.jar | tail -1)
+if [ -z "$CROMWELL" ]; then
+    echo "cromwell jar file not installed in lib, run bin/cromwell-update"
+    exit 1
+fi
+if [ $DEBUG == 1 ]; then
+    echo "Using cromwell $CROMWELL"
+fi
+
+
+# Now we can execute cromwell with all default options included for configuration.
+#
+# LOG_LEVEL: TRACE, DEBUG, INFO, WARN, ERROR, or OFF. (default is INFO).
+# LOG_MODE: pretty, standard. (default is pretty for cromwell run, standard for cromwell server).
+#
+# Some notes on setting this log level. If this is set, it seems to override almost anything else
+# that can be set (cromwell.conf, etc). 
+${JAVA} \
+	-DLOG_LEVEL=INFO -DLOG_MODE=standard \
+	-Dconfig.file=conf/cromwell.conf \
+	-jar ${CROMWELL} \
+	run \
+  	--options conf/workflow-options.json \
+	$@
+
+

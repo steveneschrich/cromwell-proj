@@ -1,0 +1,24 @@
+#!/bin/sh
+
+DEBUG=0
+
+if [ ! -f ".cromwell-proj-root" ]; then
+    echo "Not in cromwell project root, not continuing"
+    exit 1
+fi
+JAVA=$(which java)
+if [ -z "$JAVA" ]; then
+    echo "Cannot find a usable java, please install."
+    exit 1
+fi
+
+WOMTOOL=$(ls lib/womtool-*.jar | tail -1)
+if [ -z "$WOMTOOL" ]; then
+    echo "womtool jar file not installed in lib, run bin/cromwell-update"
+    exit 1
+fi
+if [ $DEBUG == 1 ]; then
+    echo "Using womtool $WOMTOOL"
+fi
+
+${JAVA} -jar ${WOMTOOL} validate $@

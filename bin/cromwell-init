@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# The goal of this script is to create a new cromwell project. This is 
+# envisioned to be a directory containing various files needed to
+# execute a cromwell workflow.
+
+
+# create directory name
+# create marker file (.cromwell-project-root)
+
+# mkdir bin
+# grab bin release? and extract in bin
+# mkdir lib
+# grab cromwell binaries and extract in lib
+# grab skeleton and extract (lib, main directory)
+# mkdir data-raw, data, etc per BBSR
+# mkdir conf
+# grab cromwell-conf project and populate
+# Print out some comments about how to use
+
+# This needs a bit more thought; kind of chicken and egg problem.
+# Would want to run (for instance) cromwell-udpate, but that implies
+# it's already there (and directory, and marker file). So hmmm.
