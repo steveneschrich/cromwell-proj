@@ -2,6 +2,7 @@
 This directory (`conf`) represents the configuration files needed for cromwell to execute. There are a couple of places where configuration for cromwell execution is defined: application-level and workflow options. And unfortunately these are not always well documented and they do appear to require two slightly different syntaxes. And perhaps they overlap (with workflow options overriding the application-level). The contents below are a discussion of the files and aspects of these files.
 
 # TLDR;
+Most of `conf/cromwell.conf` should be fairly static. Ideally you can modify things site-wide but otherwise you will want to override specific settings in `local.conf'.
 Edit the `cromwell.conf` file to suit your purpose. It has fairly extensive documentation within it. Note that it will include files from the `backends` and
 `db` directories, which can be selected for your specific purpose.
 

@@ -1,0 +1,3 @@
+#!/bin/sh
+
+cat $* | apptainer -q exec docker://linuxserver/yq:latest yq . -w 1000

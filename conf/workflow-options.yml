@@ -1,0 +1,116 @@
+# Workflow Options
+# There are workflow-specific options that one might enable
+# for specific configurations; this file allows these settings.
+# Each section is indicated below and includes various documented
+# settings with comments. Note that each is prefixed with '#', which must
+# be removed to enable the option.
+# https://cromwell.readthedocs.io/en/stable/wf_options/Overview/
+#
+#
+# backend:
+# An important parameter: what processing backend to use. The term has
+# to be defined in cromwell.conf or be one of the standard ones, like
+# Local, podman, apptainer.
+backend: slurm-apptainer
+
+# ***** Runtime Attributes *****
+# Set the default runtime attributes for this workflow.
+# Note: these will be superseded by the task definitions, if included.
+default_runtime_attributes:
+  # This is a default container for tasks with no container
+  # specified. When using a slurm-podman (or container) backend,
+  # a default container is needed so tasks can still run.
+  # Ubuntu base image has many typical tools for a general purpose
+  # run. This is likely configured in conf/backends/ already so
+  # is probably not needed (unless you intend to overwrite it).
+  # NOTE: Only set this when you use containers! Apparently setting
+  # this will trigger the use of containers even when the backend is
+  # set to Local.
+  #docker: ubuntu:latest
+
+
+
+  # You can define return codes that are ok to have, even if they are non-zero.
+  # This seems a bit dangerous as a global setting, consider this as a task
+  # setting.
+  #continueOnReturnCode:
+  #  - 4
+  #  - 8
+  #  - 15
+  #  - 16
+  #  - 23
+  #  - 42
+
+  # This is a custom flag created for containers. There are two options for 
+  # running containers (at least using apptainer/singularity): we can 
+  # isolate the environment or not. If you choose to contain_all, then you
+  # will probably want to specify a default docker_volumes that is always
+  # mounted in a container (usually the project directory). 
+  #contain_all: true
+
+  # In docker, we isolate the environment of the container from the
+  # operating system. However, symlinks require traversing parts of the
+  # filesystem. So we need default mounts within the container for filesystems
+  # that are accessed. Try to make them as specific as possible to avoid
+  # future complications. A comma separated list of src directories will work.
+  # docker_volumes:
+  # TODO: Make this an array and treat accordingly.
+  docker_volumes: "/share/dept_bbsr/Projects/Rosenberg_Stephen/4877_RSI_RNAseq_2025"
+
+
+  # If memory retry is enabled (system.memory-retry-error-keys) in
+  # cromwell.conf, then this is the default number of retries.
+  # Note: Retries is best specified in the task itself.
+  #maxRetries: 1
+
+  # Per the docs: Some programs write to the standard error stream
+  # when there is an error, but still return a zero exit code. Set 
+  # failOnStderr to true for these tasks, and it will be considered
+  # a failure if anything is written to the standard error stream.
+  # NOTE: This is best set at the task level, not as a default since
+  # many things write to stderr.
+  #failOnStderr: false
+
+
+# ***** Workflow Failure *****
+# Workflow failure mode: ContinueWhilePossible or NoNewCalls
+#workflow_failure_mode: ContinueWhilePossible
+
+
+
+# ***** Output Copying *****
+# After the run completes, cromwell can copy the output, logs,
+# and call logs out of the cromwell-executions directory to another
+# location. This can be useful for not being dependent on the 
+# cromwell-executions directory which can be removed. Be careful
+# though since the workflow specifies the outputs (which may be incomplete)
+# Since we write in-project, we do not use this option.
+#final_workflow_outputs_dir: workflow-outputs
+
+# workflow_outputs_dir_metadata:
+# This was a little confusing, but it only applies to the server endpoint.
+# When requesting the outputs via the API to the server, return either 
+# the source or destination (after copying the workflow outputs to directory).
+#final_workflow_outputs_dir_metadata: "source"
+
+# Using relative output paths seems like a good idea, but fails
+# on multiple workflow runs that have colliding output files. Which
+# is why cromwell has a deep structure in the first place.
+# In particular, our approach is to write in-project (rather than
+# copy workflow outputs at the end) which means we do not use these)
+#use_relative_output_paths: false
+#final_workflow_log_dir: workflow-logs
+#final_call_logs_dir: ''
+
+# ***** Call Caching Options *****",
+# Call caching can be disabled (write_to_cache=false) and/or
+# ignored (read_from_cache=false).
+#write_to_cache: true
+#read_from_cache: true
+
+# **** Retry with More Memory Multiplier *****",
+# When an error key (system.memory-retry-error-keys) is seen
+# in stderr, retry task with multiplier more memory. See also
+# the maxRetries in the default_runtime_attributes above.
+# and https://cromwell.readthedocs.io/en/stable/cromwell_features/RetryWithMoreMemory/
+#memory_retry_multiplier': 1.1

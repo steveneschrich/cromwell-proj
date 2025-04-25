@@ -23,6 +23,25 @@ if [ $DEBUG == 1 ]; then
     echo "Using cromwell $CROMWELL"
 fi
 
+# This is now an extended version of things
+(cd conf && make)
+WF=$(basename $1 .wdl)
+
+if [ -s conf/$WF.json ]; then
+    echo "Using workflow inputs $WF.json."
+    INPUTS_JSON="--inputs conf/${WF}.json"
+else
+    INPUTS_JSON=""
+fi
+
+WFOPTS="conf/workflow-options.json"
+if [ -s "${WFOPTS}" ]; then
+    echo "Using workflow options file ${WFOPTS}."
+    WORKFLOW_OPTIONS="--options ${WFOPTS}"
+else
+    WORKFLOW_OPTIONS=""
+fi
+
 
 # Now we can execute cromwell with all default options included for configuration.
 #
@@ -31,12 +50,17 @@ fi
 #
 # Some notes on setting this log level. If this is set, it seems to override almost anything else
 # that can be set (cromwell.conf, etc). 
-${JAVA} \
+# I was not able to determine how to disable hsqldb logging.
+CMD="${JAVA} \
 	-DLOG_LEVEL=INFO -DLOG_MODE=standard \
 	-Dconfig.file=conf/cromwell.conf \
+    -Dhsqldb.reconfig_logging=false \
+    -Dhsqldb.applog=0 -Dhsqldb.sqlog=0 \
 	-jar ${CROMWELL} \
 	run \
-  	--options conf/workflow-options.json \
-	$@
+    $INPUTS_JSON \
+  	$WORKFLOW_OPTIONS \
+	$@"
 
-
+echo $CMD
+$CMD

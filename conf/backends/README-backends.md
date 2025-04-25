@@ -15,7 +15,7 @@ A task can define some `runtime-attributes` for execution hints. These attribute
 submit = "/usr/bin/env bash ${script}"
 ```
 
-As you can see, there are builtin variables (like `script`) which are defined by cromwell when setting up a task. And then there are others that you can set (e.g., `docker` for docker container url). It is not entirely clear to me what language is being used for this string that is created, however the examples show there is some flexibility.
+As you can see, there are builtin variables (like `script`) which are defined by cromwell when setting up a task. And then there are others that you can set (e.g., `docker` for docker container url). It is not entirely clear to me what language is being used for this string that is created, however the examples show there is some flexibility. In particular, this link (https://cromwell.readthedocs.io/en/develop/tutorials/Containers/#docker) indicates a typical shell script.
 
 Some things to note about configuring submissions:
 
