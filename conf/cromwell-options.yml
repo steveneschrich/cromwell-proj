@@ -1,0 +1,8 @@
+# The goal is to provide system-level cromwell option overrides
+# to the general configuration in this file, which gets
+# incorporated into the overall cromwell run.
+backend:
+  providers:
+    slurm-apptainer:
+      config:
+        concurrent-job-limit: 100

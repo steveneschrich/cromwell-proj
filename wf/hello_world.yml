@@ -1,0 +1,3 @@
+# String (optional, default = "Dr. Smith")
+HelloWorld.name: "Dr. Smyth"
+#HelloWorld.greeting: String (optional, default = "Hello")

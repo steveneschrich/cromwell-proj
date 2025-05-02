@@ -23,18 +23,27 @@ if [ $DEBUG == 1 ]; then
     echo "Using cromwell $CROMWELL"
 fi
 
-# This is now an extended version of things
-(cd conf && make)
-WF=$(basename $1 .wdl)
+# Generate json includes from yml input
+(cd conf/yml2json && make)
 
-if [ -s conf/$WF.json ]; then
+# Manage conf files in wf specifically
+WF=$(basename $1 .wdl)
+WFDIR=wf
+
+if [ -s $WFDIR/$WF.yml ]; then
+    mkdir -p $WFDIR/cache
+    ./conf/yml2json/yq $WFDIR/$WF.yml > $WFDIR/cache/$WF.json
+    WFDIR=$WFDIR/cache
+fi
+
+if [ -s $WFDIR/$WF.json ]; then
     echo "Using workflow inputs $WF.json."
-    INPUTS_JSON="--inputs conf/${WF}.json"
+    INPUTS_JSON="--inputs $WFDIR/${WF}.json"
 else
     INPUTS_JSON=""
 fi
 
-WFOPTS="conf/workflow-options.json"
+WFOPTS="conf/yml2json/workflow-options.json"
 if [ -s "${WFOPTS}" ]; then
     echo "Using workflow options file ${WFOPTS}."
     WORKFLOW_OPTIONS="--options ${WFOPTS}"
@@ -53,7 +62,7 @@ fi
 # I was not able to determine how to disable hsqldb logging.
 CMD="${JAVA} \
 	-DLOG_LEVEL=INFO -DLOG_MODE=standard \
-	-Dconfig.file=conf/cromwell.conf \
+	-Dconfig.file=conf/system/cromwell.conf \
     -Dhsqldb.reconfig_logging=false \
     -Dhsqldb.applog=0 -Dhsqldb.sqlog=0 \
 	-jar ${CROMWELL} \
