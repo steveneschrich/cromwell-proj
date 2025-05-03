@@ -1,0 +1,16 @@
+#!/bin/sh
+
+CROMWELL_PROJ_CONF="conf/cromwell-proj.yml"
+if [ ! -f ${CROMWELL_PROJ_CONF} ]; then
+    echo "ERROR: Cannot find conf/cromwell-proj.yml, you are either running"
+    echo "from the wrong directory, or the project is not configured."
+    exit 1
+fi
+CONTAINER_EXEC=$(grep "^\s*container-exec:" ${CROMWELL_PROJ_CONF} | sed -e's/^\s*container-exec:\s*//')
+YQ=$(grep "^\s*yq:" ${CROMWELL_PROJ_CONF} | sed -e's/^\s*yq:\s*//')
+
+if [ "$CONTAINER_EXEC" == "" -o "$YQ" == "" ]; then
+    echo "ERROR: Could not find keys for container-exec or yq in the"
+    echo "${CROMWELL_PROJ_CONF} file, please verify these are present".
+fi
+cat $* | ${CONTAINER_EXEC} ${YQ} yq . -w 1000

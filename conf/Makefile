@@ -11,14 +11,18 @@
 
 # Glob yml files from the previous directory and determine
 # the corresponding json filename.
-SRC=$(patsubst ../%.yml,%.json,$(wildcard ../*.yml))
+SRC=$(patsubst %.yml,cache/%.json,$(wildcard *.yml))
+CACHEDIR=cache
 
 # Default target, remake all json files if needed
-all: $(SRC)
+all: $(CACHEDIR) $(SRC)
+
+$(CACHEDIR):
+	-mkdir -p $(CACHEDIR)
 
 # default rule to make json from parent yml
-%.json: ../%.yml
-	./yq $< > $@
+cache/%.json: %.yml
+	../bin/yq $< > $@
 
 clean:
-	rm *.json
+	rm cache/*.json

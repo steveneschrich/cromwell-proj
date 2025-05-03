@@ -22,7 +22,7 @@ if [ $DEBUG == 1 ]; then
     echo "Using womtool $WOMTOOL"
 fi
 
-${JAVA} -jar ${WOMTOOL} inputs $@ | apptainer exec docker://linuxserver/yq:latest yq -y . | sed -e's/^/#/'
+${JAVA} -jar ${WOMTOOL} inputs $@ | bin/yq -y . | sed -e's/^/#/'
 
 
 

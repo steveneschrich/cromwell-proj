@@ -1,0 +1,10 @@
+# Include here the command line to run a container
+# on your system. Examples include:
+# apptainer -q exec
+# podman run
+container-exec: apptainer -q exec
+
+# Include image URLs here, if different from defaults
+docker-images:
+   yq: docker://linuxserver/yq:latest
+   make: docker://alpine/make:latest

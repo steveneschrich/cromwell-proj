@@ -1,0 +1,12 @@
+#!/bin/sh
+
+for ymlfile in $*; do
+   BASEDIR=$(dirname $ymlfile)
+   BASENAME=$(basename $ymlfile .yml)
+   CACHEDIR=$BASEDIR/cache
+   
+   mkdir -p $CACHEDIR
+
+   echo "Caching $ymlfile..."
+   bin/yq $ymlfile > $CACHEDIR/$BASENAME.json
+done
