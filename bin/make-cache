@@ -8,5 +8,5 @@ for ymlfile in $*; do
    mkdir -p $CACHEDIR
 
    echo "Caching $ymlfile..."
-   bin/yq $ymlfile > $CACHEDIR/$BASENAME.json
+   bin/yq . $ymlfile > $CACHEDIR/$BASENAME.json
 done

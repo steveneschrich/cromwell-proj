@@ -13,4 +13,21 @@ if [ "$CONTAINER_EXEC" == "" -o "$YQ" == "" ]; then
     echo "ERROR: Could not find keys for container-exec or yq in the"
     echo "${CROMWELL_PROJ_CONF} file, please verify these are present".
 fi
-cat $* | ${CONTAINER_EXEC} ${YQ} yq . -w 1000
+
+# There should only be one file named, but there may be
+# multiple command line arguments.
+#if [ $# -lt 1 ]; then
+#    echo "ERROR: file not specified."
+#    exit 1
+#fi
+
+#FILE=${@: -1}
+#if [ ! -f ${FILE} ]; then
+#    echo "ERROR: $FILE does not exist!"
+#    exit 1
+#fi
+#unset 'argv[-1]'
+#echo $*
+#echo "cat ${FILE} | ${CONTAINER_EXEC} ${YQ} yq $argv"
+${CONTAINER_EXEC} ${YQ} yq $*
+# . -w 1000
