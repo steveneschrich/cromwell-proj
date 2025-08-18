@@ -1,17 +1,31 @@
 #!/bin/sh
+DEBUG=0
 
-CROMWELL_PROJ_CONF="conf/cromwell-proj.yml"
+CROMWELL_ROOT=$(pwd)
+if [ ! -f ${CROMWELL_ROOT}/.cromwell-proj-root ]; then
+    CROMWELL_ROOT=$(cd .. && pwd)
+    if [ ! -f ../.cromwell-proj-root ]; then
+        echo "ERROR: Cannot find cromwell project root."  >&2
+        exit 1
+    else
+        echo "Using cromwell root as ${CROMWELL_ROOT}" >&2
+    fi
+else
+    echo "Using cromwell root as ${CROMWELL_ROOT}." >&2
+fi
+
+CROMWELL_PROJ_CONF="${CROMWELL_ROOT}/conf/cromwell-proj.yml"
 if [ ! -f ${CROMWELL_PROJ_CONF} ]; then
-    echo "ERROR: Cannot find conf/cromwell-proj.yml, you are either running"
-    echo "from the wrong directory, or the project is not configured."
+    echo "ERROR: Cannot find conf/cromwell-proj.yml, you are either running" >&2
+    echo "from the wrong directory, or the project is not configured." >&2
     exit 1
 fi
 CONTAINER_EXEC=$(grep "^\s*container-exec:" ${CROMWELL_PROJ_CONF} | sed -e's/^\s*container-exec:\s*//')
 YQ=$(grep "^\s*yq:" ${CROMWELL_PROJ_CONF} | sed -e's/^\s*yq:\s*//')
 
 if [ "$CONTAINER_EXEC" == "" -o "$YQ" == "" ]; then
-    echo "ERROR: Could not find keys for container-exec or yq in the"
-    echo "${CROMWELL_PROJ_CONF} file, please verify these are present".
+    echo "ERROR: Could not find keys for container-exec or yq in the" >&2
+    echo "${CROMWELL_PROJ_CONF} file, please verify these are present". >&2
 fi
 
 # There should only be one file named, but there may be
@@ -29,5 +43,8 @@ fi
 #unset 'argv[-1]'
 #echo $*
 #echo "cat ${FILE} | ${CONTAINER_EXEC} ${YQ} yq $argv"
-${CONTAINER_EXEC} ${YQ} yq $*
+if [ $DEBUG == 1 ]; then
+    echo "Running ${CONTAINER_EXEC} ${YQ} yq . $*" >&2
+fi
+${CONTAINER_EXEC} ${YQ} yq . $*
 # . -w 1000

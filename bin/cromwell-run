@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # This script only executes the 'cromwell run' command with all options
 # turned on.
@@ -24,24 +24,22 @@ if [ $DEBUG == 1 ]; then
 fi
 
 # Generate json includes from yml input
-bin/make-cache conf/*.yml
-
+(cd conf && make)
 
 # Manage conf files in wf specifically
 WF=$(basename $1 .wdl)
-if [ -s wf/$WF.yml ]; then
-    echo "Using workflow inputs wf/$WF.yml."
-    bin/make-cache wf/$WF.yml
-    INPUTS_JSON="--inputs wf/cache/${WF}.json"
+WFJSON=conf/cache/$WF.json
+if [ -s ${WFJSON} ]; then
+    echo "Using workflow inputs conf/$WF.yml."
+    INPUTS_JSON="--inputs ${WFJSON}"
 else
     INPUTS_JSON=""
 fi
 
-WFOPTS="workflow-options"
-if [ -s conf/${WFOPTS}.yml ]; then
-    echo "Using workflow options file conf/${WFOPTS}.yml."
-    bin/make-cache conf/$WFOPTS.yml
-    WORKFLOW_OPTIONS="--options conf/cache/${WFOPTS}.json"
+WFOPTS="conf/cache/workflow-options.json"
+if [ -s ${WFOPTS} ]; then
+    echo "Using workflow options file ${WFOPTS}."
+    WORKFLOW_OPTIONS="--options ${WFOPTS}"
 else
     WORKFLOW_OPTIONS=""
 fi
