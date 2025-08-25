@@ -1,8 +1,63 @@
 #!/bin/bash
 #
+#
+# Default values
+#
 # This script only executes the 'cromwell run' command with all options
 # turned on.
 DEBUG=1
+
+# Note that we use "$@" to let each command-line parameter expand to a
+# separate word. The quotes around "$@" are essential!
+# We need TEMP as the 'eval set --' would nuke the return value of getopt.
+TEMP=$(getopt -o 'dhc:' --long 'debug,config:,help' -n 'cromwell-run' -- "$@")
+HELP="\nCromwell WDL script runner\ncromwell-run --config=config_file workflow.wdl\n"
+
+if [ $? -ne 0 ]; then
+        echo -e $HELP
+        echo 'Terminating...' >&2
+        exit 1
+fi
+
+# Note the quotes around "$TEMP": they are essential!
+eval set -- "$TEMP"
+unset TEMP
+
+while true; do
+        case "$1" in
+                'd'|'--debug')
+                        echo "DEBUG enabled"
+                        DEBUG=1
+                        shift
+                        continue
+                ;;
+                '-c'|'--config')
+                        CONFIG_FILE=$2
+                        echo 'Using config file:' $CONFIG_FILE
+                        shift 2
+                        continue
+                ;;
+                '-h'|'--help')
+                        echo -e $HELP
+                        exit 1
+                ;;
+                '--')
+                        shift
+                        break
+                ;;
+                *)
+                        echo 'Internal error!' >&2
+                        exit 1
+                ;;
+        esac
+done
+
+if [ $# == 0 ]; then
+    echo "ERROR: no WDL script provided"
+    echo -e $HELP
+    exit 1
+fi
+
 
 if [ ! -f ".cromwell-proj-root" ]; then
     echo "Not in cromwell project root, not continuing"
@@ -26,15 +81,27 @@ fi
 # Generate json includes from yml input
 (cd conf && make)
 
-# Manage conf files in wf specifically
-WF=$(basename $1 .wdl)
+# Here we assume only yml files
+if [ ! -z "$CONFIG_FILE" ]; then
+    WF=$(basename $CONFIG_FILE .yml)
+    echo "Using workflow inputs $CONFIG_FILE."
+else
+    if [ $DEBUG == 1 ]; then
+        echo "Inferring config file for running workflow."
+    fi
+    WF=$(basename $1 .wdl)
+    echo "Using workflow inputs conf/$WF.yml."
+fi
+
 WFJSON=conf/cache/$WF.json
 if [ -s ${WFJSON} ]; then
-    echo "Using workflow inputs conf/$WF.yml."
+    
     INPUTS_JSON="--inputs ${WFJSON}"
 else
+    echo "WARNING: workflow inputs not found, not using inputs. This is probably not what you want."
     INPUTS_JSON=""
 fi
+
 
 WFOPTS="conf/cache/workflow-options.json"
 if [ -s ${WFOPTS} ]; then
