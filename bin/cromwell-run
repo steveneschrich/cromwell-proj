@@ -84,7 +84,7 @@ fi
 # Here we assume only yml files
 if [ ! -z "$CONFIG_FILE" ]; then
     WF=$(basename $CONFIG_FILE .yml)
-    echo "Using workflow inputs $CONFIG_FILE."
+    echo "Using workflow inputs $CONFIG_FILE (cache file is conf/cache/$WF.json)."
 else
     if [ $DEBUG == 1 ]; then
         echo "Inferring config file for running workflow."
